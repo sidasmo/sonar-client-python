@@ -1,6 +1,5 @@
 import aiohttp
 import asyncio
-import re
 import json
 
 
@@ -44,29 +43,40 @@ class SonarClient:
         if (id):
             method = 'PUT'
             path.append(id)
-        return await self._request({"path": path, 'method': method, 'data': value})
+        return await self._request({
+            "path": path,
+            'method': method,
+            'data': value})
 
     async def _request(self, opts):
         url = opts.get('url')
         if url is None:
-            url = self.base_url + '/' + \
-                opts.get('path')[0]+'/' + opts.get('path')[1]
+            path = opts.get('path')
+            if type(path) is list:
+                path = '/'.join(path)
+            url = self.base_url + '/' + path
+            print(url)
         aio_opts = {
-            'method': opts['method'] or 'GET',
+            'method': opts.get('method') or 'GET',
             'url': url,
             'headers': {'Content-Type': 'application/json'},
-            'data': opts['data'] or {},
+            'data': opts.get('data') or {},
             'responseType': opts.get('responseType')}
         if aio_opts.get('method').lower() == 'put':
             async with self.session.put(url) as resp:
+                return await resp.text()
+        elif aio_opts.get('method').lower() == 'get':
+            async with self.session.get(url) as resp:
                 return await resp.text()
 
 
 async def main():
     print("short example: create a island and get a key:")
     client = SonarClient('http://localhost:9191/api', 'default')
-    resp = await client.create_island('telegram')
+    resp = await client.create_island('example_island')
     key = json.loads(resp).get('key')
     print(key)
+    resp = await client.info()
+    print(resp)
     await client.session.close()
 asyncio.run(main())
