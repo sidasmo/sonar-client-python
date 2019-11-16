@@ -24,7 +24,7 @@ class SonarClient:
         })
 
     async def get_schema(self, schemaName):
-        schemaName = schemaName.re('/', '-')
+        schemaName = schemaName.replace('/', '-')
         return await self._request({
             'path': [self.island, 'schema', schemaName]
         })
@@ -33,16 +33,13 @@ class SonarClient:
         return await self._request({
             'method': 'PUT',
             'path': [self.island, 'schema', schemaName],
-            'data': schema
+            'data': json.dumps(schema)
         })
 
     async def put(self, record):
-        schema, id, value = record
+        schema, value = record
         path = [self.island, 'db', schema]
         method = 'POST'
-        if (id):
-            method = 'PUT'
-            path.append(id)
         return await self._request({
             "path": path,
             'method': method,
@@ -55,7 +52,6 @@ class SonarClient:
             if type(path) is list:
                 path = '/'.join(path)
             url = self.base_url + '/' + path
-            print(url)
         aio_opts = {
             'method': opts.get('method') or 'GET',
             'url': url,
@@ -63,10 +59,13 @@ class SonarClient:
             'data': opts.get('data') or {},
             'responseType': opts.get('responseType')}
         if aio_opts.get('method').lower() == 'put':
-            async with self.session.put(url) as resp:
+            async with self.session.put(url, data=json.dumps(aio_opts)) as resp:
                 return await resp.text()
         elif aio_opts.get('method').lower() == 'get':
             async with self.session.get(url) as resp:
+                return await resp.text()
+        elif aio_opts.get('method').lower() == 'post':
+            async with self.session.post(url, data=json.dumps(aio_opts)) as resp:
                 return await resp.text()
 
 
@@ -77,6 +76,15 @@ async def main():
     key = json.loads(resp).get('key')
     print(key)
     resp = await client.info()
+    print('CLIENTINFO:' + resp)
+    from exampleschema import get_doc, get_telegram_media_schema
+    schema = get_telegram_media_schema()
+    resp = await client.put_schema("example_schema", schema)
+    schema = json.loads(resp)
+    schema_name = schema.get('schema')
+    print(schema_name)
+    record = schema_name, get_doc()
+    resp = await client.put(record)
     print(resp)
     await client.session.close()
 asyncio.run(main())
