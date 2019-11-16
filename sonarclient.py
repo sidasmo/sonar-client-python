@@ -68,6 +68,5 @@ async def main():
     resp = await client.create_island('telegram')
     key = json.loads(resp).get('key')
     print(key)
-    await client.put('{Hello World}')
     await client.session.close()
 asyncio.run(main())
