@@ -1,0 +1,76 @@
+{
+    "_": "Message",
+    "id": 73293,
+    "to_id": {
+        "_": "PeerUser",
+        "user_id": 227626084
+    },
+    "date": null,
+    "message": "",
+    "out": true,
+    "mentioned": false,
+    "media_unread": true,
+    "silent": false,
+    "post": false,
+    "from_scheduled": false,
+    "legacy": false,
+    "edit_hide": false,
+    "from_id": 246082675,
+    "fwd_from": null,
+    "via_bot_id": null,
+    "reply_to_msg_id": null,
+    "media": {
+        "_": "MessageMediaDocument",
+        "document": {
+            "_": "Document",
+            "id": 5424934966368666827,
+            "access_hash": 2599654239251047560,
+            "file_reference": null,
+            "date": null,
+            "mime_type": "video/mp4",
+            "size": 109242,
+            "dc_id": 2,
+            "attributes": [
+                {
+                    "_": "DocumentAttributeVideo",
+                    "duration": 2,
+                    "w": 240,
+                    "h": 240,
+                    "round_message": true,
+                    "supports_streaming": true
+                },
+                {
+                    "_": "DocumentAttributeFilename",
+                    "file_name": "video.mp4"
+                }
+            ],
+            "thumbs": [
+                {
+                    "_": "PhotoStrippedSize",
+                    "type": "i",
+                    "bytes": null
+                },
+                {
+                    "_": "PhotoSize",
+                    "type": "m",
+                    "location": {
+                        "_": "FileLocationToBeDeprecated",
+                        "volume_id": 247502550,
+                        "local_id": 12840
+                    },
+                    "w": 240,
+                    "h": 240,
+                    "size": 6543
+                }
+            ]
+        },
+        "ttl_seconds": null
+    },
+    "reply_markup": null,
+    "entities": [],
+    "views": null,
+    "edit_date": null,
+    "post_author": null,
+    "grouped_id": null,
+    "restriction_reason": []
+}
