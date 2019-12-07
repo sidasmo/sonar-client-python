@@ -1,5 +1,5 @@
 import aiohttp
-import json
+
 
 class SonarClient:
 
@@ -7,6 +7,9 @@ class SonarClient:
         self.base_url = base_url
         self.island = island
         self.session = aiohttp.ClientSession()
+
+    async def close(self):
+        await self.session.close()
 
     async def info(self):
         return await self._request({
@@ -67,7 +70,7 @@ class SonarClient:
             return await resp.text()
 
 
-def expand_schema (schema):
+def expand_schema(schema):
     if "/" in schema:
         return schema
     else:
