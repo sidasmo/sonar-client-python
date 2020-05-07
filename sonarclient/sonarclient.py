@@ -20,7 +20,7 @@ class SonarClient:
     async def create_island(self, name):
         return await self._request({
             'method': 'PUT',
-            'ath': ['_create', name],
+            'path': ['_create', name],
             'data': {}
         })
 
