@@ -3,8 +3,8 @@ import aiohttp
 
 class SonarClient:
 
-    def __init__(self, base_url, island):
-        self.base_url = base_url
+    def __init__(self, endpoint, island):
+        self.endpoint = endpoint
         self.island = island
         self.session = aiohttp.ClientSession()
 
@@ -59,7 +59,7 @@ class SonarClient:
             path = opts.get('path')
             if type(path) is list:
                 path = '/'.join(path)
-            url = self.base_url + '/' + path
+            url = self.endpoint + '/' + path
 
         async with self.session.request(
             opts.get('method') or 'GET',
