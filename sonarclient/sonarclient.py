@@ -30,6 +30,11 @@ class SonarClient:
             'path': [self.island, 'schema', schemaName]
         })
 
+    async def get_schemas(self):
+        return await self._request({
+            'path': [self.island, 'schema']
+        })
+
     async def put_schema(self, schemaName, schema):
         schemaName = expand_schema(schemaName)
         return await self._request({
