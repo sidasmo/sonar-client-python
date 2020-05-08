@@ -11,7 +11,7 @@ class SonarClient:
     async def close(self):
         await self.session.close()
 
-    async def info(self):
+    async def _info(self):
         return await self._request({
             'method': 'GET',
             'path': ['_info']
@@ -24,6 +24,13 @@ class SonarClient:
             'data': {}
         })
 
+    async def focusIsland(self,name):
+        if not name and self.island:
+            name = self.island
+        if not name:
+                raise Exception("Missing island name")
+       #todo
+        
     async def get_schema(self, schemaName):
         schemaName = expand_schema(schemaName)
         return await self._request({
