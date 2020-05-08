@@ -36,10 +36,10 @@ class SonarClient:
         })
 
     async def put_schema(self, schemaName, schema):
-        schemaName = expand_schema(schemaName)
+        schema['name'] = schemaName
         return await self._request({
-            'method': 'PUT',
-            'path': [self.island, 'schema', schemaName],
+            'method': 'POST',
+            'path': [self.island, 'schema'],
             'data': schema
         })
 
