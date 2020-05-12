@@ -7,8 +7,6 @@ sonar-client-python provides a python api to speak to sonar-server
 ## Tests 
 ## Functions
 
-### Solar System Exploration, 1950s – 1960s
-
 - [ ] Close
 - [ ] isWritable
 - [ ] info
