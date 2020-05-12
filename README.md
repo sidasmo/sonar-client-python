@@ -9,42 +9,42 @@ sonar-client-python provides a python api to speak to sonar-server
 
 ### Solar System Exploration, 1950s – 1960s
 
-- [ ] []Close
-- [ ] []isWritable
-- [ ] []info
-- [ ] []createIsland
-- [ ] []focusIsland
-- [ ] []_getIslandInfo
-- [ ] []getCurrentIsland
-- [X] [X]getSchemas
-- [X] [X]getSchema
-- [ ] [ ] putSchema
-- [ ] [ ] putSource
-- [ ] [ ] _localdriveKey
-- [ ] [ ] writeResourceFile
-- [ ] [ ] readResourceFile
-- [ ] [ ] createResource
-- [ ] [ ] parseHyperdriveUrl
-- [ ] [ ] resourceHttpUrl
-- [ ] [ ] get
-- [ ] [ ] put
-- [ ] [ ] sync
-- [ ] [ ] query
-- [ ] [ ] search
-- [ ] [ ] updateIsland
-- [ ] [ ] getDrives
-- [ ] [ ] readdir
-- [ ] [ ] makeLink
-- [ ] [ ] getResource
-- [ ] [ ] writeFile
-- [ ] [ ] readFile
-- [ ] [ ] statFile
-- [ ] [ ] pullSubscription
-- [ ] [ ] ackSubscription
-- [ ] [ ] _url
-- [ ] [ ] fileUrl
-- [X] [ ] _request
-- [ ] [ ] initCommandClient
-- [ ] [ ] callCommand
-- [ ] [ ] createQueryStream
-- [ ] [ ] createSubscriptionStream
+- [ ] Close
+- [ ] isWritable
+- [ ] info
+- [ ] createIsland
+- [ ] focusIsland
+- [ ] _getIslandInfo
+- [ ] getCurrentIsland
+- [X] getSchemas
+- [X] getSchema
+- [ ] putSchema
+- [ ] putSource
+- [ ] _localdriveKey
+- [ ] writeResourceFile
+- [ ]  readResourceFile
+- [ ] createResource
+- [ ] parseHyperdriveUrl
+- [ ] resourceHttpUrl
+- [ ] get
+- [ ] put
+- [ ] sync
+- [ ] query
+- [ ] search
+- [ ] updateIsland
+- [ ] getDrives
+- [ ] readdir
+- [ ] makeLink
+- [ ] getResource
+- [ ] writeFile
+- [ ] readFile
+- [ ] statFile
+- [ ] pullSubscription
+- [ ] ackSubscription
+- [ ] _url
+- [ ] fileUrl
+- [X] _request
+- [ ] initCommandClient
+- [ ] callCommand
+- [ ] createQueryStream
+- [ ] createSubscriptionStream
