@@ -19,6 +19,7 @@ class TestClientMethods(unittest.TestCase):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        TestClientMethods.ENDPOINT = sys.argv.pop()
+        print(sys.argv)
         TestClientMethods.ISLAND = sys.argv.pop()
+        TestClientMethods.ENDPOINT = sys.argv.pop()
     unittest.main()
