@@ -25,9 +25,10 @@ class SonarClient:
         })
 
     async def get_schema(self, schemaName):
-        schemaName = expand_schema(schemaName)
+        # schemaName = expand_schema(schemaName)
         return await self._request({
-            'path': [self.island, 'schema', schemaName]
+            'path': [self.island, 'schema'],
+            'params': {'name': schemaName}
         })
 
     async def get_schemas(self):
@@ -71,6 +72,7 @@ class SonarClient:
             url,
             headers={'Content-Type': 'application/json'},
             json=opts.get('data') or {},
+            params=opts.get('params')
         ) as resp:
             return await resp.text()
 
