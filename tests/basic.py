@@ -17,12 +17,12 @@ class TestClientMethods(unittest.TestCase):
         loop.close()
         assert "core/schema" in schemas
         assert "core/schema" in schema
+        print("SCHEMAAAAA:" + schema)
         assert len(schema) <= 150
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        print(sys.argv)
         TestClientMethods.ISLAND = sys.argv.pop()
         TestClientMethods.ENDPOINT = sys.argv.pop()
     unittest.main()
