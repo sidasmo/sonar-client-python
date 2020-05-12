@@ -4,9 +4,10 @@ sonar-client-python provides a python api to speak with sonar
 
 ## Tests 
 you can run tests with:
-'python tests/basic.py' with default endpoint: 'http://localhost:9191/api' and Island: 'default'
+```python tests/basic.py``` 
+with default endpoint: 'http://localhost:9191/api' and Island: 'default'
 or you can run the tests with specified Endpoint and Island:
-'python tests/basic.py ENDPOINT ISLAND'
+```python tests/basic.py ENDPOINT ISLAND```
 
 ## Functions to implement
 
