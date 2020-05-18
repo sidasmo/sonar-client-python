@@ -29,7 +29,8 @@ or you can run the tests with specified Endpoint and Island:
 - [ ] parseHyperdriveUrl
 - [ ] resourceHttpUrl
 - [ ] get
-- [ ] put
+- [X] put
+- [X] del(ete)
 - [ ] sync
 - [ ] query
 - [ ] search
