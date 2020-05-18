@@ -54,13 +54,8 @@ class SonarClient:
     async def put(self, record):
         schema = record.get('schema')
         schema = expand_schema(schema)
-        value = record.get('value')
-        id = record.get('id')
         path = [self.island, 'db']
         method = 'PUT'
-        # if id:
-        #     method = 'PUT'
-        #     path.append(id)
         return await self._request({
             "path": path,
             'method': method,

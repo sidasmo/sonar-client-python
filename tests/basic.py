@@ -14,10 +14,19 @@ class TestClientMethods(unittest.TestCase):
         schemas = loop.run_until_complete(client.get_schemas())
         schema = loop.run_until_complete(client.get_schema('core/source'))
         loop.run_until_complete(client.close())
-        loop.close()
+        # loop.close()
         assert "core/source" in schemas
-        assert "core/source" in schema
+        assert "properties" in schema
         assert len(schema) <= 300
+
+    def test_put_record(self):
+        client = SonarClient(self.ENDPOINT, self.ISLAND)
+        loop = asyncio.get_event_loop()
+        record = { 'schema': 'doc', 'value': { 'title': 'hello world' } }
+        id = loop.run_until_complete(client.put(record))
+        loop.run_until_complete(client.close())
+        loop.close()
+        print(id)
 
 
 if __name__ == '__main__':
