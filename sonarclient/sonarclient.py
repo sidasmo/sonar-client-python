@@ -57,9 +57,17 @@ class SonarClient:
         path = [self.island, 'db']
         method = 'PUT'
         return await self._request({
-            "path": path,
+            'path': path,
             'method': method,
             'data': record})
+
+    async def delete(self, record):
+        path = [self.island, 'db', record['id']]
+        return await self._request({
+            'path': path,
+            'method': 'DELETE',
+            'params': {'schema': record['schema']}
+        })
 
     async def _request(self, opts):
         url = opts.get('url')

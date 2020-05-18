@@ -19,14 +19,15 @@ class TestClientMethods(unittest.TestCase):
         assert "properties" in schema
         assert len(schema) <= 300
 
-    def test_put_record(self):
+    def test_put_and_del_record(self):
         client = SonarClient(self.ENDPOINT, self.ISLAND)
         loop = asyncio.get_event_loop()
-        record = { 'schema': 'doc', 'value': { 'title': 'hello world' } }
-        id = loop.run_until_complete(client.put(record))
+        record = { 'schema': 'doc', 'id': 'foo', 'value': { 'title': 'hello world' } }
+        loop.run_until_complete(client.put(record))
+        loop.run_until_complete(client.delete(record))
         loop.run_until_complete(client.close())
         loop.close()
-        print(id)
+        
 
 
 if __name__ == '__main__':
