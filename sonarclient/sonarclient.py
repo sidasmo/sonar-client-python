@@ -1,5 +1,6 @@
 import aiohttp
 import binascii
+import json
 from os import urandom
 from .collection import Collection
 from .constants import DEFAULT_ENDPOINT
