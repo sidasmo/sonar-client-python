@@ -40,7 +40,9 @@ class SonarClient:
             'data': opts
         })
         print("RESULT OF CREATE_COLLECTION: ", res)
-        return self.open_collection(name)
+        collection = await self.open_collection(name)
+        print("RESULT OF OPEN_COLLECTION: ", collection)
+        return collection
 
     async def update_collection(self, name, info):
         return self._request({
