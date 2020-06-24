@@ -96,7 +96,6 @@ class Collection:
 
     async def fetch(self, path, opts=dict()):
         if not opts.get('endpoint'):
-            opts['url'] = self.endpoint
+            opts['endpoint'] = self.endpoint
         opts['path'] = path
-        print("OPTS: ", opts)
         return await self._client._request(opts)
