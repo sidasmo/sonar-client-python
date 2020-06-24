@@ -1,25 +1,30 @@
 import aiohttp
 import binascii
 from os import urandom
-
+from collection import Collection
+from constants import DEFAULT_ENDPOINT
 
 
 class SonarClient:
 
-    def __init__(self, endpoint, island, opts=dict()):
-        self.endpoint = endpoint
-        self.island = island
-        self.session = aiohttp.ClientSession()
+    def __init__(self, opts=dict()):
+        self.endpoint = opts.get('endpoint') or DEFAULT_ENDPOINT
+        if self.endpoint.endswith('/'):
+            self.endpoint = self.endpoint[:-1]
+        self._collections = {}
         # TODO: check if id is generated correctly
-        self.id = opts.get('id', binascii.hexlify(urandom(16)).decode())
-        self.name = opts.get('name')
+        self._id = opts.get('id', binascii.hexlify(urandom(16)).decode())
 
-        self._cacheid = None
-        if opts.get('cache') != False:
-            self._cacheid = 'client:' + self.id + ':' + self.island 
+        self.session = aiohttp.ClientSession()
+        self.name = opts.get('name')
+        # TODO: implement commands
 
     async def close(self):
         await self.session.close()
+
+    async def list_collections(self):
+        _info = await self._info()
+        return _info.collections
 
     async def _info(self):
         return await self._request({
@@ -27,77 +32,35 @@ class SonarClient:
             'path': ['_info']
         })
 
-    async def create_island(self, name):
-        return await self._request({
+    async def create_collection(self, name, opts={}):
+        print("CREATE_COLLECTION CALLED")
+        res = await self._request({
             'method': 'PUT',
             'path': ['_create', name],
-            'data': {}
+            'data': opts
+        })
+        print("RESULT OF CREATE_COLLECTION: ", res)
+        return self.open_collection(name)
+
+    async def update_collection(self, name, info):
+        return self._request({
+            'method': 'PATCH',
+            'path': name,
+            'data': info
         })
 
-    async def focusIsland(self,name):
-        if not name and self.island:
-            name = self.island
-        if not name:
-                raise Exception("Missing island name")
-       #todo
-        
-    async def get_schema(self, schemaName):
-        # schemaName = expand_schema(schemaName)
-        return await self._request({
-            'path': [self.island, 'schema'],
-            'params': {'name': schemaName}
-        })
-
-    async def get_schemas(self):
-        return await self._request({
-            'path': [self.island, 'schema']
-        })
-
-    async def put_schema(self, schemaName, schema):
-        schema['name'] = schemaName
-        return await self._request({
-            'method': 'POST',
-            'path': [self.island, 'schema'],
-            'data': schema
-        })
-
-    async def put(self, record):
-        schema = record.get('schema')
-        schema = expand_schema(schema)
-        path = [self.island, 'db']
-        method = 'PUT'
-        return await self._request({
-            'path': path,
-            'method': method,
-            'data': record})
-
-    async def get(self, schema, id, opts):
-        return await self.query('records',{'schema': schema, 'id': id}, opts)
-
-    async def delete(self, record):
-        path = [self.island, 'db', record['id']]
-        return await self._request({
-            'path': path,
-            'method': 'DELETE',
-            'params': {'schema': record['schema']}
-        })
-
-    async def query(self, name, args, opts=dict()):
-        if self._cacheid:
-            opts['cacheid'] = self._cacheid
-        
-        records = await self._request({
-            'path': [self.island, '_query', name],
-            'method': 'POST',
-            'data': args,
-            'params': opts
-        })
-
-        # TODO: is cache already implemented? assign in constructor
-        # if (self._cacheid):
-        #     return self._cache.batch(records)
-        
-        return records
+    async def open_collection(self, key_or_name):
+        print("OPEN_COLLECTION CALLED")
+        if self._collections.get(key_or_name):
+            print("COLLECTION FOUND IN CLIEN._COLLECTIONS")
+            return self._collections.get(key_or_name)
+        collection = Collection(self, key_or_name)
+        # TODO: check if this throws if the collection does not exist
+        await collection.open()
+        self._collections[collection.name] = collection
+        # TODO: maybe need to check that key exists (could be None?)
+        self._collections[collection.key] = collection
+        return collection
 
     async def _request(self, opts):
         url = opts.get('url')
@@ -122,3 +85,61 @@ def expand_schema(schema):
         return schema
     else:
         return "_/" + schema
+
+    # async def get_schema(self, schemaName):
+    #     # schemaName = expand_schema(schemaName)
+    #     return await self._request({
+    #         'path': [self.island, 'schema'],
+    #         'params': {'name': schemaName}
+    #     })
+
+    # async def get_schemas(self):
+    #     return await self._request({
+    #         'path': [self.island, 'schema']
+    #     })
+
+    # async def put_schema(self, schemaName, schema):
+    #     schema['name'] = schemaName
+    #     return await self._request({
+    #         'method': 'POST',
+    #         'path': [self.island, 'schema'],
+    #         'data': schema
+    #     })
+
+    # async def put(self, record):
+    #     schema = record.get('schema')
+    #     schema = expand_schema(schema)
+    #     path = [self.island, 'db']
+    #     method = 'PUT'
+    #     return await self._request({
+    #         'path': path,
+    #         'method': method,
+    #         'data': record})
+
+    # async def get(self, schema, id, opts):
+    #     return await self.query('records', {'schema': schema, 'id': id}, opts)
+
+    # async def delete(self, record):
+    #     path = [self.island, 'db', record['id']]
+    #     return await self._request({
+    #         'path': path,
+    #         'method': 'DELETE',
+    #         'params': {'schema': record['schema']}
+    #     })
+
+    # async def query(self, name, args, opts=dict()):
+    #     if self._cacheid:
+    #         opts['cacheid'] = self._cacheid
+
+    #     records = await self._request({
+    #         'path': [self.island, '_query', name],
+    #         'method': 'POST',
+    #         'data': args,
+    #         'params': opts
+    #     })
+
+    #     # TODO: is cache already implemented? assign in constructor
+    #     # if (self._cacheid):
+    #     #     return self._cache.batch(records)
+
+    #     return records

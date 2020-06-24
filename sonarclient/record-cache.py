@@ -6,7 +6,7 @@ class RecordCache:
         self._byId = {}
 
     def batch(self, records):
-        for [i, record] in record.entries():
+        for (i, record) in records.items():
             if record.value:
                 self.add(record)
             else:
@@ -14,16 +14,29 @@ class RecordCache:
         return records
 
     def add(self, record):
-        cacheId = self.cacheId(record)
-        self.records[cacheId] = record
-        self._byId[record.id] = self._byId[record.id] or []
-        self._byId[record.id].push(record)
+        cacheid = self.cacheid(record)
+        self.records[cacheid] = record
+        self._byId[record.id] = self._byId.get(record.id) or []
+        self._byId[record.id].append(cacheid)
+
+    def get_by_id(self, id):
+        if not self._byId.get(id):
+            return []
+        return self._byId.get(id)
+
+    def has(self, req):
+        if not req.key and not req.seq:
+            return False
+        cacheid = self.cacheid(req)
+        return bool(self.records.get(cacheid))
 
     def upgrade(self, record):
-        cacheId = self.cacheId(record)
-        if self.records[cacheId]:
-            return {self.records[cacheId], record}
+        cacheid = self.cacheid(record)
+        if self.records.get(cacheid):
+            return dict(self.records[cacheid], **record)
         return record
 
-    def cacheId(self, record):
-        return record.lseq
+    # Transform stream function
+
+    def cacheid(self, record):
+        return record.key + '@' + record.seq
