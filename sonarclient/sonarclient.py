@@ -66,11 +66,13 @@ class SonarClient:
 
     async def _request(self, opts):
         url = opts.get('url')
+        endpoint = opts.get('endpoint') or self.endpoint
         if url is None:
             path = opts.get('path')
             if type(path) is list:
                 path = '/'.join(path)
-            url = self.endpoint + '/' + path
+            url = endpoint + path
+            print("URL: ", url)
 
         async with self.session.request(
             opts.get('method') or 'GET',
