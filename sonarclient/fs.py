@@ -1,4 +1,4 @@
-from constants import HYPERDRIVE_SCHEME
+from .constants import HYPERDRIVE_SCHEME
 import json
 import parse_dat_url
 
@@ -17,7 +17,7 @@ class Fs:
         # Support hyper:// URLs
         if path.startswith(HYPERDRIVE_SCHEME):
             url = parse_dat_url(path)
-            path = url['host'] + url['path']
+            path = url['host'] + url['path']        
 
         # Support no other absolute URLs for now
         elif path.find('://') != -1:

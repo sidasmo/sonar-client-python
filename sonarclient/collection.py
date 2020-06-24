@@ -1,7 +1,7 @@
-from schema import Schema
-from record-cache import RecordCache
-from fs import Fs
-from resources import Resources
+from .schema import Schema
+from .record_cache import RecordCache
+from .fs import Fs
+from .resources import Resources
 
 
 class Collection:
@@ -11,11 +11,11 @@ class Collection:
         self._client = client
         self._info = dict()
         self._name = name
-        self._cache = new RecordCache
+        self._cache = RecordCache()
 
-        self.schema = new Schema()
-        self.fs = new Fs(self)
-        self.resources = new Resources(self)
+        self.schema = Schema()
+        self.fs = Fs(self)
+        self.resources = Resources(self)
 
     @property
     def name(self):
@@ -72,7 +72,7 @@ class Collection:
         #     return self._cache.get(req)
         return self.query('records', req, opts)
 
-    async def del(self, record):
+    async def delete(self, record):
         return self.fetch('/db' + record.get('id'), {
             'method': 'DELETE',
             'params': {'schema': record.get('schema')}

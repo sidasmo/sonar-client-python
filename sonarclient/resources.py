@@ -1,5 +1,5 @@
 import sys
-import constants
+from .constants import *
 
 
 class Resources:

@@ -1,8 +1,8 @@
 import aiohttp
 import binascii
 from os import urandom
-from collection import Collection
-from constants import DEFAULT_ENDPOINT
+from .collection import Collection
+from .constants import DEFAULT_ENDPOINT
 
 
 class SonarClient:
