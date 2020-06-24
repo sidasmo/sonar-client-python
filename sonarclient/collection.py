@@ -98,5 +98,5 @@ class Collection:
         if not opts.get('endpoint'):
             opts['url'] = self.endpoint
         opts['path'] = path
-        print("OPTS url: ", opts['url'])
+        print("OPTS: ", opts)
         return await self._client._request(opts)
