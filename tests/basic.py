@@ -10,13 +10,14 @@ from async_generator import yield_, async_generator
 @pytest.mark.asyncio
 async def test_put_and_del_record(event_loop):
     client = SonarClient()
-    collection = await client.create_collection('2ndcollection')
+    collection = await client.create_collection('testndcollection')
     print("COLLECTION: ", collection)
     record = {
         'schema': 'doc',
         'id': 'foo',
         'value': {'title': 'hello world'}}
     res = await collection.put(record)
+    print(res)
     id = res.get('id')
     results = await collection.query(
         'records', {'id': id}, {'waitForSync': True})
@@ -34,8 +35,8 @@ async def start_sonar_server(path_to_sonar, tmpdir, event_loop):
             wd = os.getcwd()
             os.chdir(path_to_sonar)
             process = await asyncio.create_subprocess_shell(
-                "./sonar start -s" + tmpdir,
-                stdout=subprocess.PIPE,
+                "DEBUG=sonar-server ./sonar start -s", #+ tmpdir,
+                stdout=subprocess.STDOUT,
                 stderr=subprocess.PIPE
                 )
             os.chdir(wd)
@@ -43,3 +44,5 @@ async def start_sonar_server(path_to_sonar, tmpdir, event_loop):
         except Exception:
             print('error')
         await yield_(process)
+
+

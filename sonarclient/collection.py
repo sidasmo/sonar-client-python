@@ -8,7 +8,7 @@ import json
 class Collection:
 
     def __init__(self, client, name):
-        self.endpoint = client.endpoint + '/' + name
+        self.endpoint = client.endpoint + '/' + name + '/'
         self._client = client
         self._info = dict()
         self._name = name
@@ -33,15 +33,12 @@ class Collection:
         return self._info
 
     async def open(self):
-        print("OPENING COLLECTION")
         info = await self.fetch('/')
-        print("RESULT FROM FETCH /: INFO: ", info)
-        print("TYPE OF INFO: ", type(info))
+        print('INFO:', info)
         info = json.loads(info)
         self._info = info
         schemas = await self.fetch('/schema')
         schemas = json.loads(schemas)
-        print("RESULT OF FETCH /SCHEMA: ", schemas)
         self.schema.add(schemas)
 
     async def add_feed(self, key, info=dict()):
@@ -97,5 +94,4 @@ class Collection:
     async def fetch(self, path, opts=dict()):
         if not opts.get('endpoint'):
             opts['endpoint'] = self.endpoint
-        opts['path'] = path
-        return await self._client._request(opts)
+        return await self._client.fetch(path, opts)

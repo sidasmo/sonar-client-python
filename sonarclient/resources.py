@@ -1,5 +1,5 @@
 import sys
-from .constants import *
+from .constants import HYPERDRIVE_SCHEME, METADATA_ID, SCHEMA_RESOURCE
 
 
 class Resources:
@@ -24,7 +24,7 @@ class Resources:
             raise Exception("record has no file url")
         if not opts.metadata:
             opts.metadata = {}
-        opts.metadata[constants.METADATA_ID] = record.id
+        opts.metadata[METADATA_ID] = record.id
         return self.collection.fs.write_file(url, file, opts)
 
     async def read_file(self, record, opts={}):
@@ -55,7 +55,7 @@ class Resources:
             print("Error: ", sys.exc_info()[0])
 
         if existing:
-            id = existing.metadata[constants.METADATA_ID]
+            id = existing.metadata[METADATA_ID]
             if not id:
                 if not opts.force:
                     raise Exception("file exists and has no resource attached.\
@@ -68,10 +68,10 @@ class Resources:
                         raise Exception("file exists, with resource ${id}.\
                                         set update to overwrite.")
 
-        id = id | opts.id
+        id = id or opts.id
 
         res = await self.collection.put({
-            "schema": constants.SCHEMA_RESOURCE,
+            "schema": SCHEMA_RESOURCE,
             "id": id,
             "value": {
                 *value,
@@ -82,7 +82,7 @@ class Resources:
 
         records = await self.collection.get({
             "id": res.id,
-            "schema": constants.SCHEMA_RESOURCE},
+            "schema": SCHEMA_RESOURCE},
             {"waitForSync": True})
         if not records:
             raise Exception("Error loading created resource")
@@ -94,11 +94,11 @@ class Resources:
 
 
 def create_hyperdrive_url(key, path):
-    return constants.HYPERDRIVE_SCHEME + key + path
+    return HYPERDRIVE_SCHEME + key + path
 
 
 def get_content_url(record):
-    if record.schema != constants.SCHEMA_RESOURCE:
+    if record.schema != SCHEMA_RESOURCE:
         return None
     if not record.value.contentUrl:
         return None
