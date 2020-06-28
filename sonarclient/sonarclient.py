@@ -6,6 +6,7 @@ from os import urandom
 from urllib.parse import urlencode
 from .collection import Collection
 from .constants import DEFAULT_ENDPOINT
+import json
 
 
 class SonarClient:
@@ -36,7 +37,7 @@ class SonarClient:
     async def create_collection(self, name, opts={}):
         await self.fetch('/_create/' + name, {
             'method': 'PUT',
-            'data': opts
+            'body': opts
         })
         collection = await self.open_collection(name)
         return collection
@@ -44,7 +45,7 @@ class SonarClient:
     async def update_collection(self, name, info):
         return self.fetch(name, {
             'method': 'PATCH',
-            'data': info
+            'body': info
         })
 
     async def open_collection(self, key_or_name):
@@ -62,63 +63,72 @@ class SonarClient:
 
     async def fetch(self, url, opts={}):
         print('FETCHOPTS: ', opts, "URL: ", url)
-        if not re.match(r'^https?:\/\/', url):
-            if '://' not in url:
-                Exception('Only http: and https: protocols are supported.')
-            if hasattr(opts, 'endpoint'):
-                print("############################################HELLO")
-                url = opts['endpoint']
+        if not re.match(r'https?://', url):
+            if '://' in url:
+                raise Exception('Only http: and https: protocols are supported.')
+            if url[0] != '/':
+                url = '/' + url
+            if opts.get('endpoint'):
+                url = opts['endpoint'] + url
             else:
                 url = self.endpoint + url
-        if not hasattr(opts, 'headers'):
+
+        if not opts.get('headers'):
             opts['headers'] = {}
-        if not hasattr(opts, 'requestType'):
-            if hasattr(opts, 'body'):
+        if not opts.get('requestType'):
+            if opts.get('body'):
                 try:
                     opts['body'].decode()
                     opts['requestType'] = 'buffer'
                 except (UnicodeDecodeError, AttributeError):
                     opts['requestType'] = 'json'
-        if hasattr(opts, 'params'):
+
+        if opts.get('params'):
             searchParams = urlencode(opts['params'])
             url += '?' + searchParams
-        if hasattr(opts, 'params'):
-            if opts['requestType'] == 'json':
-                opts['body'] = ujson.loads(opts['body'])
-                opts['header']['content-type'] = 'application/json'
-            if opts['requestType'] == 'buffer':
-                opts['header']['content-type'] = 'application/octet-stream'
+            print("URL WITH SEARCH PARAMS: ", url)
+
+        if opts.get('requestType') == 'json':
+            opts['headers']['content-type'] = 'application/json'
+        if opts.get('requestType') == 'buffer':
+            opts['headers']['content-type'] = 'application/octet-stream'
+
         print('OPTS: ', opts, 'URL: ', url)
+
         async with self.session.request(
-            opts.get('method') or 'GET', url,
-                headers={'Content-Type': 'application/json'},
-                json=opts.get('data') or {},
-                params=opts.get('params')
+            opts.get('method') or 'GET', 
+            url,
+            headers=opts.get('headers') or {'content-type': 'application/json'},
+            json=opts.get('body') or {},
+            params=opts.get('params') or {}
         ) as resp:
-            if resp.status != 'ok':
+            print("STATUS OF RESPONSE: ", resp.status)
+            if resp.status != '200':
                 try:
                     message = (await resp.json())['error']
                 except Exception:
                     message = await resp.text()
                 print(message)
-            try: 
-                return resp.json()
-            except Exception:
-                print("NO JSON")
-            if hasattr(opts.responseType) and opts.responseType == 'stream':
-                return resp.body
-            if hasattr(opts.responseType) and opts.responseType == 'buffer':
+            
+            if opts.get('responseType') == 'stream':
+                return await resp.body
+            if opts.get('responseType') == 'buffer':
                 if resp.content: 
                     return await resp.content.read(10)
                 else:
                     return await resp.content.read(10)
-            return resp.text()
+            
+            try:
+                return await resp.json()
+            except Exception:
+                print("NO JSON")
+            return await resp.text()
 
-def expand_schema(schema):
-    if "/" in schema:
-        return schema
-    else:
-        return "_/" + schema
+# def expand_schema(schema):
+#     if "/" in schema:
+#         return schema
+#     else:
+#         return "_/" + schema
 
     # async def get_schema(self, schemaName):
     #     # schemaName = expand_schema(schemaName)

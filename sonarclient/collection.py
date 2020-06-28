@@ -8,7 +8,7 @@ import json
 class Collection:
 
     def __init__(self, client, name):
-        self.endpoint = client.endpoint + '/' + name + '/'
+        self.endpoint = client.endpoint + '/' + name
         self._client = client
         self._info = dict()
         self._name = name
@@ -34,11 +34,8 @@ class Collection:
 
     async def open(self):
         info = await self.fetch('/')
-        print('INFO:', info)
-        info = json.loads(info)
         self._info = info
         schemas = await self.fetch('/schema')
-        schemas = json.loads(schemas)
         self.schema.add(schemas)
 
     async def add_feed(self, key, info=dict()):
