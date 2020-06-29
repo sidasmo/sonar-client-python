@@ -77,12 +77,11 @@ class SonarClient:
         if not opts.get('headers'):
             opts['headers'] = {}
         if not opts.get('requestType'):
-            if opts.get('body'):
-                try:
-                    opts['body'].decode()
-                    opts['requestType'] = 'buffer'
-                except (UnicodeDecodeError, AttributeError):
-                    opts['requestType'] = 'json'
+            try:
+                opts.get('body').decode()
+                opts['requestType'] = 'buffer'
+            except (UnicodeDecodeError, AttributeError):
+                opts['requestType'] = 'json'
 
         if opts.get('params'):
             searchParams = urlencode(opts['params'])
