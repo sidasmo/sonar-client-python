@@ -33,9 +33,7 @@ async def start_sonar_server(scope='session'):
     with tempfile2.TemporaryDirectory() as tmpdir:
         try:
             wd = os.getcwd()
-            print("Hello1: ", os.getcwd())
             os.chdir(sonar_location)
-            print("Hello2: ", os.getcwd())
             process = await asyncio.create_subprocess_shell(
                 "./sonar start -s" + tmpdir,
                 stdout=subprocess.PIPE,
