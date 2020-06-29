@@ -28,7 +28,7 @@ async def test_put_and_del_record(start_sonar_server, event_loop):
 
 
 @pytest.fixture
-async def start_sonar_server(scope='session'):
+async def start_sonar_server(scope='Session'):
     sonar_location = '../sonar'
     with tempfile2.TemporaryDirectory() as tmpdir:
         try:
@@ -38,13 +38,11 @@ async def start_sonar_server(scope='session'):
                 "./sonar start -s" + tmpdir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-            )
+            ).wait()
+          
             out, err = process.communicate(timeout=30)
-            print(process)
             os.chdir(wd)
-            print(out)
             return await yield_(process)
 
         except Exception:
             print('error')
-            process.kill()
