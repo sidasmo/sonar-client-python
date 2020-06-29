@@ -49,9 +49,7 @@ class SonarClient:
         })
 
     async def open_collection(self, key_or_name):
-        print("OPEN_COLLECTION CALLED")
         if self._collections.get(key_or_name):
-            print("COLLECTION FOUND IN CLIEN._COLLECTIONS")
             return self._collections.get(key_or_name)
         collection = Collection(self, key_or_name)
         # TODO: check if this throws if the collection does not exist
@@ -62,7 +60,6 @@ class SonarClient:
         return collection
 
     async def fetch(self, url, opts={}):
-        print('FETCHOPTS: ', opts, "URL: ", url)
         if not re.match(r'https?://', url):
             if '://' in url:
                 raise Exception(
@@ -86,14 +83,12 @@ class SonarClient:
         if opts.get('params'):
             searchParams = urlencode(opts['params'])
             url += '?' + searchParams
-            print("URL WITH SEARCH PARAMS: ", url)
 
         if opts.get('requestType') == 'json':
             opts['headers']['content-type'] = 'application/json'
         if opts.get('requestType') == 'buffer':
             opts['headers']['content-type'] = 'application/octet-stream'
 
-        print('OPTS: ', opts, 'URL: ', url)
 
         async with self.session.request(
             opts.get('method') or 'GET',
@@ -103,13 +98,11 @@ class SonarClient:
             json=opts.get('body') or {},
             params=opts.get('params') or {}
         ) as resp:
-            print("STATUS OF RESPONSE: ", resp.status)
             if resp.status != '200':
                 try:
                     message = (await resp.json())['error']
                 except Exception:
                     message = await resp.text()
-                print(message)
             if opts.get('responseType') == 'stream':
                 return await resp.body
             if opts.get('responseType') == 'buffer':
