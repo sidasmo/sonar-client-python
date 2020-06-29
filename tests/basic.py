@@ -26,6 +26,21 @@ async def test_put_and_del_record(start_sonar_server, event_loop):
     assert results[0].get('value').get('title') == 'hello world'
     await client.close()
 
+@pytest.mark.asyncio
+async def test_get_and_delete_record(event_loop):
+    client = SonarClient()
+    collection = await client.create_collection('foocollection')
+    record = {
+        'schema': 'doc',
+        'id': 'foo',
+        'value': {'title': 'hello world'}}
+    res = await collection.put(record)
+    id = res['id']
+    records = await collection.get({'id': id}, {'waitForSync': 'true'})
+    assert len(records) == 1
+    await collection.delete(record)
+    nu_records = await collection.get({'id': id}, {'waitForSync': 'true'})
+    assert len(nu_records) == 0
 
 @pytest.fixture
 async def start_sonar_server(scope='Session'):

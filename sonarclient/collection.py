@@ -73,9 +73,9 @@ class Collection:
         return await self.query('records', req, opts)
 
     async def delete(self, record):
-        return await self.fetch('/db' + record.get('id'), {
+        return await self.fetch('/db/' + record.get('id'), {
             'method': 'DELETE',
-            'params': {'schema': record.get('schema')}
+            'params': {'schema': record.get('schema')},
         })
 
     async def put_schema(self, schema):
