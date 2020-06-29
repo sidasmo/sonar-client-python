@@ -8,7 +8,7 @@ from async_generator import yield_, async_generator
 
 
 @pytest.mark.asyncio
-async def test_put_and_del_record(event_loop):
+async def test_put_and_del_record(start_sonar_server, event_loop):
     client = SonarClient()
     collection = await client.create_collection('testndcollection')
     print("COLLECTION: ", collection)
@@ -20,29 +20,35 @@ async def test_put_and_del_record(event_loop):
     print(res)
     id = res.get('id')
     results = await collection.query(
-        'records', {'id': id}, {'waitForSync': True})
-    await client.close()
+        'records', {'id': id}, {'waitForSync': 'true'})
     assert len(results) == 1
     assert results[0].get('id') == id
     assert results[0].get('value').get('title') == 'hello world'
-
-
-@async_generator
-@pytest.fixture(scope='module')
-async def start_sonar_server(path_to_sonar, tmpdir, event_loop):
+    await client.close()
+    
+@pytest.fixture
+async def start_sonar_server(scope='session'):
+    sonar_location = '../sonar'
     with tempfile2.TemporaryDirectory() as tmpdir:
         try:
             wd = os.getcwd()
-            os.chdir(path_to_sonar)
+            print("Hello1: ", os.getcwd())
+            os.chdir(sonar_location)
+            print("Hello2: ", os.getcwd())
             process = await asyncio.create_subprocess_shell(
-                "DEBUG=sonar-server ./sonar start -s", #+ tmpdir,
-                stdout=subprocess.STDOUT,
+                "./sonar start -s" + tmpdir,
+                stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
                 )
+            out, err = process.communicate(timeout=30)
+            print(process)
             os.chdir(wd)
-            print("PROZESS", process)
+            print(out)
+            return await yield_(process)
+            
         except Exception:
             print('error')
-        await yield_(process)
+            process.kill()
+        
 
 
