@@ -65,7 +65,8 @@ class SonarClient:
         print('FETCHOPTS: ', opts, "URL: ", url)
         if not re.match(r'https?://', url):
             if '://' in url:
-                raise Exception('Only http: and https: protocols are supported.')
+                raise Exception(
+                    'Only http: and https: protocols are supported.')
             if url[0] != '/':
                 url = '/' + url
             if opts.get('endpoint'):
@@ -96,9 +97,10 @@ class SonarClient:
         print('OPTS: ', opts, 'URL: ', url)
 
         async with self.session.request(
-            opts.get('method') or 'GET', 
+            opts.get('method') or 'GET',
             url,
-            headers=opts.get('headers') or {'content-type': 'application/json'},
+            headers=opts.get('headers') or {
+                'content-type': 'application/json'},
             json=opts.get('body') or {},
             params=opts.get('params') or {}
         ) as resp:
@@ -109,15 +111,13 @@ class SonarClient:
                 except Exception:
                     message = await resp.text()
                 print(message)
-            
             if opts.get('responseType') == 'stream':
                 return await resp.body
             if opts.get('responseType') == 'buffer':
-                if resp.content: 
+                if resp.content:
                     return await resp.content.read(10)
                 else:
                     return await resp.content.read(10)
-            
             try:
                 return await resp.json()
             except Exception:

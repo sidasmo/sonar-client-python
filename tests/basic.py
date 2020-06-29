@@ -25,7 +25,8 @@ async def test_put_and_del_record(start_sonar_server, event_loop):
     assert results[0].get('id') == id
     assert results[0].get('value').get('title') == 'hello world'
     await client.close()
-    
+
+
 @pytest.fixture
 async def start_sonar_server(scope='session'):
     sonar_location = '../sonar'
@@ -39,16 +40,13 @@ async def start_sonar_server(scope='session'):
                 "./sonar start -s" + tmpdir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-                )
+            )
             out, err = process.communicate(timeout=30)
             print(process)
             os.chdir(wd)
             print(out)
             return await yield_(process)
-            
+
         except Exception:
             print('error')
             process.kill()
-        
-
-

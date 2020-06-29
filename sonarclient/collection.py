@@ -57,8 +57,7 @@ class Collection:
 
         # TODO: implement cacheid stuff
         # if self._cacheid:
-        #     return self._cache.batch(records)
-       
+        #     return self._cache.batch(records)     
         return records
 
     async def put(self, record):
