@@ -103,6 +103,7 @@ class SonarClient:
                     message = (await resp.json())['error']
                 except Exception:
                     message = await resp.text()
+                    print('EXCEPTION', message)
             if opts.get('responseType') == 'stream':
                 return await resp.body
             if opts.get('responseType') == 'buffer':

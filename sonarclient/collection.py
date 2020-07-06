@@ -21,12 +21,15 @@ class Collection:
     @property
     def name(self):
         if self._info:
-            return self._info['name']
+            if type(self._info) is not str:
+                return self._info.get("name")
         return self._name
 
     @property
     def key(self):
-        return self._info and self._info['key']
+        if type(self._info) is not str:
+            return self._info and self._info['key']
+        return self._info
 
     @property
     def info(self):

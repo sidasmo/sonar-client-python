@@ -4,13 +4,20 @@ import asyncio
 import tempfile2
 import subprocess
 import os
-from async_generator import yield_, async_generator
-
+import time
+from xprocess import ProcessStarter
 
 @pytest.mark.asyncio
-async def test_put_and_del_record(start_sonar_server, event_loop):
-    client = SonarClient()
-    collection = await client.create_collection('testndcollection')
+async def fs_with_strings(client):
+    collection = await client.create_collection('test')
+    await collection.fs.writefile('/test/hello','world')
+    result = await collection.fs.readFile('/test/hello')
+    print(result)
+    assert result == "woreld"
+
+@pytest.mark.asyncio
+async def test_put_and_query_record(client):
+    collection = await client.create_collection('collection')
     record = {
         'schema': 'doc',
         'id': 'foo',
@@ -22,9 +29,24 @@ async def test_put_and_del_record(start_sonar_server, event_loop):
     assert len(results) == 1
     assert results[0].get('id') == id
     assert results[0].get('value').get('title') == 'hello world'
+
+@pytest.fixture()
+async def client(event_loop):
+    client = SonarClient()
+    yield client
     await client.close()
 
-@pytest.mark.asyncio
+@pytest.fixture(autouse=True)
+def start_sonar_server(xprocess):
+    class Starter(ProcessStarter):
+        pattern = "listening on http://localhost:9191"
+        args = ['node', '/home/osuiowq/Projekte/sonar/sonar-server/launch.js', '--dev', '-s' '/tmp']   
+    xprocess.ensure("sonarServer", Starter)
+    yield 
+    xprocess.getinfo("sonarServer").terminate()        
+
+# TODO: deletion on serverside may not working at the moment
+""" @pytest.mark.asyncio
 async def test_get_and_delete_record(start_sonar_server,event_loop):
     client = SonarClient()
     collection = await client.create_collection('foocollection')
@@ -41,26 +63,5 @@ async def test_get_and_delete_record(start_sonar_server,event_loop):
     print('DELETE', deletemsg)
     nu_records = await collection.get({'id': id}, {'waitForSync': 'true'})
     # TODO: deletion is not implemented yet on server-side
-    #assert len(nu_records) == 1
-    await client.close()
-
-
-@pytest.fixture
-async def start_sonar_server(scope='Session'):
-    sonar_location = '../sonar'
-    with tempfile2.TemporaryDirectory() as tmpdir:
-        try:
-            wd = os.getcwd()
-            os.chdir(sonar_location)
-            process = await asyncio.create_subprocess_shell(
-                "./sonar start -s" + tmpdir,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            ).wait()
-          
-            out, err = process.communicate(timeout=30)
-            os.chdir(wd)
-            return await yield_(process)
-
-        except Exception:
-            print('error')
+    #assert len(nu_records) == 0
+    await client.close() """
