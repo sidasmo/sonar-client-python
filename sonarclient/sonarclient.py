@@ -60,6 +60,7 @@ class SonarClient:
         return collection
 
     async def fetch(self, url, opts={}):
+        print('URL: ', url, 'OPTS: ', opts)
         if not re.match(r'https?://', url):
             if '://' in url:
                 raise Exception(
@@ -70,7 +71,7 @@ class SonarClient:
                 url = opts['endpoint'] + url
             else:
                 url = self.endpoint + url
-
+        print('URL: ', url, 'OPTS: ', opts)
         if not opts.get('headers'):
             opts['headers'] = {}
         if not opts.get('requestType'):
@@ -96,7 +97,7 @@ class SonarClient:
             headers=opts.get('headers') or {
                 'content-type': 'application/json'},
             json=opts.get('body') or {},
-            params=opts.get('params') or {}
+            #params=opts.get('params') or {}
         ) as resp:
             if resp.status != 200:
                 try:

@@ -52,8 +52,9 @@ async def test_get_and_delete_record(client):
     deletemsg= await collection.delete(record)
     print('DELETE', deletemsg)
     nu_records = await collection.get({'id': id}, {'waitForSync': 'true'})
+    print('NU ',nu_records)
     # TODO: deletion is not implemented yet on server-side
-    #assert len(nu_records) == 0
+    assert len(nu_records) == 0
 
 @pytest.mark.asyncio
 async def test_fs_with_strings(client):
