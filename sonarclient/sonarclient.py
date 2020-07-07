@@ -71,7 +71,6 @@ class SonarClient:
                 url = opts['endpoint'] + url
             else:
                 url = self.endpoint + url
-        print('URL: ', url, 'OPTS: ', opts)
         if not opts.get('headers'):
             opts['headers'] = {}
         if not opts.get('requestType'):
@@ -87,16 +86,19 @@ class SonarClient:
 
         if opts.get('requestType') == 'json':
             opts['headers']['content-type'] = 'application/json'
+            data = None
+            json = opts.get('body') or {}
         if opts.get('requestType') == 'buffer':
             opts['headers']['content-type'] = 'application/octet-stream'
-
-
+            data = opts.get('body') or {}
+            json = None
         async with self.session.request(
             opts.get('method') or 'GET',
             url,
             headers=opts.get('headers') or {
                 'content-type': 'application/json'},
-            json=opts.get('body') or {},
+            json=json,
+            data=data
             #params=opts.get('params') or {}
         ) as resp:
             if resp.status != 200:

@@ -61,4 +61,14 @@ async def test_fs_with_strings(client):
     collection = await client.create_collection('test')
     await collection.fs.write_file('/test/hello','world')
     result = await collection.fs.read_file('/test/hello')
-    assert eval(result.decode('utf-8')) == 'world'
+    print("result:", result)
+    assert result.decode('utf-8') == "world"
+
+@pytest.mark.asyncio
+async def test_fs_with_buffers(client):
+    collection = await client.create_collection('test')
+    buf = b'hello'
+    await collection.fs.write_file('/test/bin', buf)
+    res = await collection.fs.read_file('/test/bin')
+    print(res) 
+    assert type(res) == bytes

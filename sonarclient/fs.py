@@ -70,6 +70,7 @@ class Fs:
 
     async def write_file(self, path, file, opts=dict()):
         requestType = opts.get('requestType') or 'buffer'
+        print("REQUESTTYPE: ", requestType)
         params = dict()
         if opts.get('metadata'):
             params['metadata'] = json.dumps(opts['metadata'])
@@ -80,7 +81,7 @@ class Fs:
             'params': params,
             'responseType': 'text',
             'requestType': requestType,
-            # 'binary': True,
+            #'binary': True,
             'onUploadProgress': opts.get('onUploadProgress')
         })
 
