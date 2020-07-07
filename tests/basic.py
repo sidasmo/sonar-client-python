@@ -4,16 +4,7 @@ import asyncio
 import tempfile2
 import subprocess
 import os
-import time
 from xprocess import ProcessStarter
-
-@pytest.mark.asyncio
-async def fs_with_strings(client):
-    collection = await client.create_collection('test')
-    await collection.fs.writefile('/test/hello','world')
-    result = await collection.fs.readFile('/test/hello')
-    print(result)
-    assert result == "woreld"
 
 @pytest.mark.asyncio
 async def test_put_and_query_record(client):
@@ -46,9 +37,8 @@ def start_sonar_server(xprocess):
     xprocess.getinfo("sonarServer").terminate()        
 
 # TODO: deletion on serverside may not working at the moment
-""" @pytest.mark.asyncio
-async def test_get_and_delete_record(start_sonar_server,event_loop):
-    client = SonarClient()
+@pytest.mark.asyncio
+async def test_get_and_delete_record(client):
     collection = await client.create_collection('foocollection')
     record = {
         'schema': 'doc',
@@ -64,4 +54,10 @@ async def test_get_and_delete_record(start_sonar_server,event_loop):
     nu_records = await collection.get({'id': id}, {'waitForSync': 'true'})
     # TODO: deletion is not implemented yet on server-side
     #assert len(nu_records) == 0
-    await client.close() """
+
+@pytest.mark.asyncio
+async def test_fs_with_strings(client):
+    collection = await client.create_collection('test')
+    await collection.fs.write_file('/test/hello','world')
+    result = await collection.fs.read_file('/test/hello')
+    assert eval(result.decode('utf-8')) == 'world'

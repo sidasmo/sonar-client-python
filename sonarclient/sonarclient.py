@@ -98,12 +98,11 @@ class SonarClient:
             json=opts.get('body') or {},
             params=opts.get('params') or {}
         ) as resp:
-            if resp.status != '200':
+            if resp.status != 200:
                 try:
                     message = (await resp.json())['error']
                 except Exception:
                     message = await resp.text()
-                    print('EXCEPTION', message)
             if opts.get('responseType') == 'stream':
                 return await resp.body
             if opts.get('responseType') == 'buffer':

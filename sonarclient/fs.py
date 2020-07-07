@@ -11,7 +11,7 @@ class Fs:
 
     async def fetch(self, path, opts=dict()):
         path = self.resolve_url(path)
-        return self.collection.fetch(path, opts)
+        return await self.collection.fetch(path, opts)
 
     def resolve_url(self, path):
         # Support hyper:// URLs
@@ -74,7 +74,7 @@ class Fs:
         if opts.get('metadata'):
             params['metadata'] = json.dumps(opts['metadata'])
 
-        return self.fetch(path, {
+        return await self.fetch(path, {
             'method': 'PUT',
             'body': file,
             'params': params,
@@ -87,11 +87,11 @@ class Fs:
     async def read_file(self, path, opts=dict()):
         opts['responseType'] = opts.get('responseType') or 'buffer'
         opts['requestType'] = opts.get('requestType') or 'buffer'
-        return self.fetch(path, opts)
+        return await self.fetch(path, opts)
 
     async def create_read_stream(self, path, opts=dict()):
         opts['responseType'] = 'stream'
-        return self.read_file(path, opts)
+        return await self.read_file(path, opts)
 
     async def stat_file(self, path):
-        return self.fetch(path)
+        return await self.fetch(path)
