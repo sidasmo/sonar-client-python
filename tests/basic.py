@@ -19,10 +19,10 @@ async def client(event_loop):
 def ensure_path(path):
     __tracebackhide__ = True
     if path == None:
-        raise Exception("--path is required")  
-    if not os.path.isfile(path + "/sonar-server/launch.js"):
-        print(path)
-        raise Exception("Invalid path, please use: pytest basic.py --path i.e. ~/user/projects/sonar")    
+        pytest.exit("--path is required", 1)
+    path = path + "/sonar-server/launch.js"  
+    if not os.path.isfile(path):
+        pytest.exit("Invalid path, please use: pytest basic.py --path ~/path/to/sonar", 1)
     return path
 
 @pytest.fixture(autouse=True, scope="module")
@@ -30,7 +30,7 @@ def start_sonar_server(path,xprocess):
     path = ensure_path(path)
     class Starter(ProcessStarter):
         pattern = "listening on http://localhost:9191"
-        args = ['node', path + '/sonar-server/launch.js', '--dev', '-s' '/tmp']   
+        args = ['node', path, '--dev', '-s' '/tmp']   
     xprocess.ensure("sonarServer", Starter)
     yield 
     xprocess.getinfo("sonarServer").terminate()  
