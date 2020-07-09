@@ -5,6 +5,35 @@ import tempfile2
 import subprocess
 import os
 from xprocess import ProcessStarter
+@pytest.fixture(scope="module")
+def path(pytestconfig):
+    print(pytestconfig.getoption("path"))
+    return pytestconfig.getoption("path")
+
+@pytest.fixture()
+async def client(event_loop):
+    client = SonarClient()
+    yield client
+    await client.close()
+    
+def ensure_path(path):
+    __tracebackhide__ = True
+    if path == None:
+        raise Exception("--path is required")  
+    if not os.path.isfile(path + "/sonar-server/launch.js"):
+        print(path)
+        raise Exception("Invalid path, please use: pytest basic.py --path i.e. ~/user/projects/sonar")    
+    return path
+
+@pytest.fixture(autouse=True, scope="module")
+def start_sonar_server(path,xprocess):
+    path = ensure_path(path)
+    class Starter(ProcessStarter):
+        pattern = "listening on http://localhost:9191"
+        args = ['node', path + '/sonar-server/launch.js', '--dev', '-s' '/tmp']   
+    xprocess.ensure("sonarServer", Starter)
+    yield 
+    xprocess.getinfo("sonarServer").terminate()  
 
 @pytest.mark.asyncio
 async def test_put_and_query_record(client):
@@ -21,22 +50,6 @@ async def test_put_and_query_record(client):
     assert results[0].get('id') == id
     assert results[0].get('value').get('title') == 'hello world'
 
-@pytest.fixture()
-async def client(event_loop):
-    client = SonarClient()
-    yield client
-    await client.close()
-
-@pytest.fixture(autouse=True)
-def start_sonar_server(xprocess):
-    class Starter(ProcessStarter):
-        pattern = "listening on http://localhost:9191"
-        args = ['node', '/home/osuiowq/Projekte/sonar/sonar-server/launch.js', '--dev', '-s' '/tmp']   
-    xprocess.ensure("sonarServer", Starter)
-    yield 
-    xprocess.getinfo("sonarServer").terminate()        
-
-# TODO: deletion on serverside may not working at the moment
 @pytest.mark.asyncio
 async def test_get_and_delete_record(client):
     collection = await client.create_collection('foocollection')
@@ -47,13 +60,9 @@ async def test_get_and_delete_record(client):
     res = await collection.put(record)
     id = res['id']
     records = await collection.get({'id': id}, {'waitForSync': 'true'})
-    print("RECORD:" ,records)
     assert len(records) == 1
     deletemsg= await collection.delete(record)
-    print('DELETE', deletemsg)
     nu_records = await collection.get({'id': id}, {'waitForSync': 'true'})
-    print('NU ',nu_records)
-    # TODO: deletion is not implemented yet on server-side
     assert len(nu_records) == 0
 
 @pytest.mark.asyncio
