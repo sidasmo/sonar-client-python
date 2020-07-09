@@ -2,38 +2,46 @@ from sonarclient import SonarClient
 import pytest
 import asyncio
 import tempfile2
-import subprocess
+import io
 import os
 from xprocess import ProcessStarter
+
+
 @pytest.fixture(scope="module")
 def path(pytestconfig):
     print(pytestconfig.getoption("path"))
     return pytestconfig.getoption("path")
+
 
 @pytest.fixture()
 async def client(event_loop):
     client = SonarClient()
     yield client
     await client.close()
-    
+
+
 def ensure_path(path):
     __tracebackhide__ = True
     if path == None:
         pytest.exit("--path is required", 1)
-    path = path + "/sonar-server/launch.js"  
+    path = path + "/sonar-server/launch.js"
     if not os.path.isfile(path):
-        pytest.exit("Invalid path, please use: pytest basic.py --path ~/path/to/sonar", 1)
+        pytest.exit(
+            "Invalid path, please use: pytest basic.py --path ~/path/to/sonar", 1)
     return path
 
+
 @pytest.fixture(autouse=True, scope="module")
-def start_sonar_server(path,xprocess):
+def start_sonar_server(path, xprocess):
     path = ensure_path(path)
+
     class Starter(ProcessStarter):
         pattern = "listening on http://localhost:9191"
-        args = ['node', path, '--dev', '-s' '/tmp']   
+        args = ['node', path, '--dev', '-s' '/tmp']
     xprocess.ensure("sonarServer", Starter)
-    yield 
-    xprocess.getinfo("sonarServer").terminate()  
+    yield
+    xprocess.getinfo("sonarServer").terminate()
+
 
 @pytest.mark.asyncio
 async def test_put_and_query_record(client):
@@ -50,6 +58,7 @@ async def test_put_and_query_record(client):
     assert results[0].get('id') == id
     assert results[0].get('value').get('title') == 'hello world'
 
+
 @pytest.mark.asyncio
 async def test_get_and_delete_record(client):
     collection = await client.create_collection('foocollection')
@@ -61,17 +70,19 @@ async def test_get_and_delete_record(client):
     id = res['id']
     records = await collection.get({'id': id}, {'waitForSync': 'true'})
     assert len(records) == 1
-    deletemsg= await collection.delete(record)
+    deletemsg = await collection.delete(record)
     nu_records = await collection.get({'id': id}, {'waitForSync': 'true'})
     assert len(nu_records) == 0
+
 
 @pytest.mark.asyncio
 async def test_fs_with_strings(client):
     collection = await client.create_collection('test')
-    await collection.fs.write_file('/test/hello','world')
+    await collection.fs.write_file('/test/hello', 'world')
     result = await collection.fs.read_file('/test/hello')
     print("result:", result)
     assert result.decode('utf-8') == "world"
+
 
 @pytest.mark.asyncio
 async def test_fs_with_buffers(client):
@@ -79,5 +90,5 @@ async def test_fs_with_buffers(client):
     buf = b'hello'
     await collection.fs.write_file('/test/bin', buf)
     res = await collection.fs.read_file('/test/bin')
-    print(res) 
+    print(res)
     assert type(res) == bytes
