@@ -1,6 +1,8 @@
 # sonar-client-python
-## Work in progress
-sonar-client-python provides a python api to speak with sonar
+
+*Work in progress*
+
+sonar-client-python provides a python API to speak with [Sonar](https://github.com/arso-project/sonar).
 
 ## Tests 
 you can run tests with:
