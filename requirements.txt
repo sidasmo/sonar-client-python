@@ -23,7 +23,7 @@ pytest-asyncio==0.14.0
 pytest-cov==2.10.0
 pytest-subprocess==0.1.5
 pytest-xprocess==0.13.1
-rsa==4.6
+rsa==4.7
 six==1.15.0
 Telethon==1.14.0
 tempfile2==0.1.1
